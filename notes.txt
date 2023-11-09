@@ -4,6 +4,7 @@ TODO:
 	create core (see notes for functions)
 
 notes:
+	uses Port: 5656
 	how transfering files work:
 		client -> network : broadcasts a requested known file from the network
 		network : other connected clients re-broadcasts the message to other clients
@@ -19,4 +20,10 @@ notes:
 
 	core:
 		handles and manages transaction IDs that a computer has
+
+packet Format:
+	0 - 3: SPTP
+	4: Mode: (01)BROD, (02)TRAC, (03)DATA
+	5 - 8: Dest: (IP or any other Identifier)
+	8 - 1024: Relevant Data
 
