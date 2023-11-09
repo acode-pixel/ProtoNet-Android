@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
+#include "client.h"
+#include "core.h"
 
 int main(int argc, char* argv[]){
 	struct Packet {
@@ -22,13 +24,11 @@ int main(int argc, char* argv[]){
 	memcpy(&test->IP, (int*)"\xa3\xff\x00\x24", sizeof(int));
 	memcpy(test->data, data, sizeof(data)+1);
 
-	printf("%lu\n", sizeof(*test));
-
 	FILE* f = fopen("mem.bin", "wb");
 	fwrite(test, 1, 1024, f);
 	fclose(f);
 
-
+	connectToNetwork((uint32_t)"\x80");
 
 	return 0;
 }
