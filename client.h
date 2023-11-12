@@ -1,25 +1,28 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/ip.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <assert.h>
 #include "./core.h"
-#define PORT 5656
+#define C_PORT 8888
 
-int connectToNetwork(uint32_t IP){
+typedef struct Client {
+	char* name;
+	int Socket;
+} Client;
+
+int connectToNetwork(int IP){
 	int tcpSocket = socket(AF_INET, SOCK_STREAM, 0);
 
 	struct sockaddr_in sockaddr;
 	sockaddr.sin_family = AF_INET;
-	sockaddr.sin_port = htons(PORT);
-	sockaddr.sin_addr.s_addr = htonl(IP);
+	sockaddr.sin_port = htons(C_PORT);
+	sockaddr.sin_addr.s_addr = htonl((uint32_t)IP);
 
-	assert((bind(tcpSocket, (struct sockaddr*)&sockaddr, sizeof(sockaddr))) == 0);
+	printf("%i %p %lu", tcpSocket, &sockaddr, sizeof(sockaddr));
+
+	if ((bind(tcpSocket, (struct sockaddr*)&sockaddr, sizeof(sockaddr))) == -1){
+		exit(errno);
+	}
+	
 
 }
 
