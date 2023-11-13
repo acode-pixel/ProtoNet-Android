@@ -29,7 +29,7 @@ int main(int argc, char* argv[]){
 	assert(test2 != NULL);
 
 	FILE* a = fopen("Server.bin", "wb");
-	fwrite(test2, 1, sizeof(*test2) + strlen(test2->dir), a);
+	fwrite(test2, 1, test2->size, a);
 	fclose(a);
 
 	return 0;
