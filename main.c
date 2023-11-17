@@ -9,28 +9,25 @@
 
 int main(int argc, char* argv[]){
 	
-	Packet *test = NULL;
-	test = (Packet*) malloc(sizeof(Packet));
-	uint8_t* data = "BROD\xff\xff\xff\xff\x0a";
-	memset(test, 0, sizeof(*test));
-	memcpy(test->Proto, (char*)"SPTP", sizeof(int));
-	memcpy(test->Mode, (char*)"\x01", sizeof(char));
-	memcpy(&test->IP, (uint32_t*)"\xa3\xff\x00\x24", sizeof(uint32_t));
-	memcpy(test->data, data, sizeof(data)+1);
+	if (strcmp(argv[1], "client")==0){
+		printf("Connecting to %s", argv[2]);
+		if (connectToNetwork(argv[2]) == -1){
+			perror("Failed to connect to client");
+		}
+		return 0;
+	}
+	
+	if (strcmp(argv[1], "serv") == 0){
+		Server* test2 = NULL;
+		test2 = (Server*) Init(argv[2], argv[3], "Test", "/Users/donaldgutierrez");
 
-	FILE* f = fopen("mem.bin", "wb");
-	fwrite(test, 1, 1024, f);
-	fclose(f);
+		assert(test2 != NULL);
 
-	//connectToNetwork((int)"\x7f\x00\x00\x01");
-	Server* test2 = NULL;
-	test2 = (Server*) Init("127.0.0.1", "Test", "/Users/donaldgutierrez");
+		assert(listen(test2->Socket, 10)==0);
+		assert(accept(test2->Socket, test2->ServerOpts.sockaddr, &test2->ServerOpts.socklen)>-1);
 
-	assert(test2 != NULL);
-
-	FILE* a = fopen("Server.bin", "wb");
-	fwrite(test2, 1, test2->size, a);
-	fclose(a);
+		printf("Starting Server");
+	}
 
 	return 0;
 }

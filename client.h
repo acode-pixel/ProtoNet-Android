@@ -2,27 +2,28 @@
 #define CLIENT_H
 
 #include "./core.h"
-#define C_PORT 8888
+#define C_PORT 5657
 
 typedef struct Client {
-	char* name;
 	int Socket;
+	char name[12];
 } Client;
 
-int connectToNetwork(int IP){
+int connectToNetwork(char IP[]){
 	int tcpSocket = socket(AF_INET, SOCK_STREAM, 0);
 
 	struct sockaddr_in sockaddr;
 	sockaddr.sin_family = AF_INET;
 	sockaddr.sin_port = htons(C_PORT);
-	sockaddr.sin_addr.s_addr = htonl((uint32_t)IP);
+	inet_aton(IP, &sockaddr.sin_addr);
 
-	printf("%i %p %lu", tcpSocket, &sockaddr, sizeof(sockaddr));
-
-	if ((bind(tcpSocket, (struct sockaddr*)&sockaddr, sizeof(sockaddr))) == -1){
-		exit(errno);
-	}
+	//printf("%i %p %lu", tcpSocket, &sockaddr, sizeof(sockaddr));
 	
+	if (connect(tcpSocket, (struct sockaddr*)&sockaddr, sizeof(sockaddr)) == -1){
+		return -1;
+	}
+
+	return tcpSocket;
 
 }
 
