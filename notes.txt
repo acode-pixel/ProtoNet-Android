@@ -4,6 +4,8 @@ TODO:
 	create core (see notes for functions)
 
 notes:
+	use epoll to run caller without stopping program
+
 	uses Port: 5656
 	how transfering files work:
 		client -> network : broadcasts a requested known file from the network

@@ -7,8 +7,10 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <sys/ioctl.h>
 #include <netinet/ip.h>
 #include <arpa/inet.h>
+#include <net/if.h>
 #include <errno.h>
 #include <assert.h>
 #include <unistd.h>
@@ -27,16 +29,7 @@ typedef struct SocketOpt {
 	char dontroute;
 } SocketOpt;
 
-int setSockOpts(int sock, SocketOpt* so, char opts[]){
-	so->reuseaddr = opts[0];
-	so->keepalive = opts[1];
-	so->dontroute = opts[2];
-
-	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &opts[0], sizeof(int));
-	setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, &opts[1], sizeof(int));
-	setsockopt(sock, SOL_SOCKET, SO_DONTROUTE, &opts[2], sizeof(int));
-	
-	return 0;
-}
+int setSockOpts(int sock, SocketOpt* so, char opts[]);
+uint32_t getInterIP(int fd,char inter[]);
 
 #endif

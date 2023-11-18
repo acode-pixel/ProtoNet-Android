@@ -1,29 +1,4 @@
-#ifndef SERVER_H
-#define SERVER_H
-#define S_PORT 5657
-
-#include "core.h"
-#include "client.h"
-#include <sys/ioctl.h>
-#include <net/if.h>
-
-typedef struct serverOpts {
-	SocketOpt socketOpt;
-	struct sockaddr* sockaddr;
-	socklen_t socklen;
-} serverOpts;
-
-typedef struct Server {
-	int Socket;
-	int nConn;
-	uint32_t IP;
-	uint32_t destIP;
-	size_t size;
-	char serverName[12];
-	serverOpts ServerOpts;
-	Client client;
-	char dir[];
-} Server;
+#include "server.h"
 
 Server* Init(char* inter, char* ip, char* serverName, char Dir[]){
 	// Check if Dir is NULL
@@ -46,6 +21,9 @@ Server* Init(char* inter, char* ip, char* serverName, char Dir[]){
 	ifr.ifr_addr.sa_family = AF_INET;
 	strncpy(ifr.ifr_name, inter, IFNAMSIZ-1);
 	ioctl(serv->Socket, SIOCGIFADDR, &ifr);
+	// set fd as nonblocking
+	//fcntl(serv->Socket, F_SETFL, O_NONBLOCK);
+
 	sockaddr.sin_addr.s_addr = ((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr.s_addr;
 
 	serv->nConn = 0;
@@ -69,11 +47,9 @@ Server* Init(char* inter, char* ip, char* serverName, char Dir[]){
 
 	strcpy(serv->client.name, serverName);
 	if (ip != NULL){
-		serv->client.Socket = connectToNetwork(ip);
-		memcpy(&serv->destIP, &sockaddr.sin_addr.s_addr, sizeof(int));
+		serv->client.Socket = connectToNetwork(ip, &serv->client);
+		serv->destIP = inet_addr(ip);
 	}
 	return serv;
 }
 
-
-#endif
