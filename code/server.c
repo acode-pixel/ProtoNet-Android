@@ -22,15 +22,13 @@ Server* Init(char* inter, char* ip, char* serverName, char Dir[]){
 	strncpy(ifr.ifr_name, inter, IFNAMSIZ-1);
 	ioctl(serv->Socket, SIOCGIFADDR, &ifr);
 	// set fd as nonblocking
-	//fcntl(serv->Socket, F_SETFL, O_NONBLOCK);
+	//fcntl(serv->Socket, F_SETFL, O_NONBLOCK, 1);
 
 	sockaddr.sin_addr.s_addr = ((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr.s_addr;
 
 	serv->nConn = 0;
 	serv->IP = sockaddr.sin_addr.s_addr; // src IP
-	if (ip != NULL){
-       		inet_pton(AF_INET, ip, (struct in_addr*)&serv->destIP);// dst IP
-	}
+
 	strcpy(serv->serverName, serverName);
 	memcpy(serv->dir, Dir, strlen(Dir));
 	
@@ -46,7 +44,7 @@ Server* Init(char* inter, char* ip, char* serverName, char Dir[]){
 	serv->ServerOpts.socklen = sizeof(sockaddr);
 
 	strcpy(serv->client.name, serverName);
-	if (ip != NULL){
+	if (strlen(ip) > 0){
 		serv->client.Socket = connectToNetwork(ip, &serv->client);
 		serv->destIP = inet_addr(ip);
 	}

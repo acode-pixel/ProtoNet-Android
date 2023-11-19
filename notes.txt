@@ -29,3 +29,12 @@ packet Format:
 	5 - 8: Dest: (IP or any other Identifier)
 	8 - 1024: Relevant Data
 
+	Modes:
+		BROD:
+			8 : hops between client and server
+			9 - 1024 : File client requested 
+
+args:
+./a.out client [inter] [name|none] [ip] [file request]
+./a.out serv [inter] [ip to connect to|none] [serv name] [dir] 
+

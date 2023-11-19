@@ -15,12 +15,18 @@
 #include <assert.h>
 #include <unistd.h>
 
+struct BROD {
+	uint8_t hops;
+	char fileReq[];
+};
+
 typedef struct Packet {
 	char Proto[4];
 	uint32_t IP;
 	char Mode[1];
+	uint32_t datalen;
 
-	uint8_t data[1024-9];
+	uint8_t data[]; /* MAX 1024 */
 } Packet;
 
 typedef struct SocketOpt {
@@ -31,5 +37,6 @@ typedef struct SocketOpt {
 
 int setSockOpts(int sock, SocketOpt* so, char opts[]);
 uint32_t getInterIP(int fd,char inter[]);
+int sendPck(int fd, uint32_t IP, char* Mode, void* data);
 
 #endif

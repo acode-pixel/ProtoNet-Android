@@ -12,5 +12,5 @@ typedef struct Client {
 Client* Cl_Init(char* inter, char name[]);
 
 int connectToNetwork(char* IP, Client* cli);
-int sendPck(int fd, uint32_t IP, char* Mode, char data[]);
+int makeFileReq(int fd, char* IP, char File[]);
 #endif

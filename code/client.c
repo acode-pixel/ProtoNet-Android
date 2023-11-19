@@ -32,23 +32,12 @@ int connectToNetwork(char* IP, Client* cli){
 
 }
 
-int sendPck(int fd, uint32_t IP, char* Mode, char data[]){
-	Packet* pck = (Packet*) malloc(sizeof(Packet));
-	memcpy(pck->Proto, "SPTP", 4);
-	memcpy(&pck->IP, &IP, sizeof(IP));
-	memcpy(pck->Mode, Mode, 1);
-	if (sizeof(*data) > 1015){
-		errno = 84;
-		perror("Pck creation error");
-		return -1;
-	}
-	memcpy(pck->data, data, strlen(data));
-	
-	if (send(fd, pck, sizeof(*pck), 0) == -1){
-		perror("Falied to send Pck");
-		return -1;
-	}
-
-	free(pck);
+int makeFileReq(int fd, char* IP, char File[]){
+	struct BROD* br = (struct BROD*)malloc(sizeof(struct BROD) + strlen(File));
+	br->hops = 1;
+	strcpy(br->fileReq, File);
+	assert(sendPck(fd, inet_addr(IP), "\x01", br) == 0);
+	free(br);
 	return 0;
-}
+
+};

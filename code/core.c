@@ -22,3 +22,26 @@ uint32_t getInterIP(int fd,char inter[]){
 	} 
 	return ((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr.s_addr;
 }
+
+int sendPck(int fd, uint32_t IP, char* Mode, void* data){
+	Packet* pck = (Packet*) malloc(sizeof(Packet) + strlen(data)+1);
+	memcpy(pck->Proto, "SPTP", 4);
+	memcpy(&pck->IP, &IP, sizeof(IP));
+	memcpy(pck->Mode, Mode, 1);
+	if (strlen(data) > 1024){
+		errno = 84;
+		perror("Pck creation error");
+		free(pck);
+		return -1;
+	}
+	memcpy(pck->data, data, strlen(data)+1);
+	pck->datalen = strlen(data);
+
+	if (send(fd, pck, sizeof(*pck) + strlen(data)+1, 0) == -1){
+		perror("Falied to send Pck");
+		return -1;
+	}
+
+	free(pck);
+	return 0;
+}

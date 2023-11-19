@@ -18,14 +18,14 @@ int main(int argc, char* argv[]){
 			perror("Failed to connect to client");
 		}
 
-		sendPck(test1->Socket, inet_addr(argv[4]), "\x01", "test");
+		makeFileReq(test1->Socket, argv[4], argv[5]);
 
 		return 0;
 	}
 	
 	if (strcmp(argv[1], "serv") == 0){
 		Server* test2 = NULL;
-		test2 = (Server*) Init(argv[2], argv[3], "Test", "/Users/donaldgutierrez");
+		test2 = (Server*) Init(argv[2], argv[3], argv[4], argv[5]);
 
 		assert(test2 != NULL);
 
@@ -34,9 +34,11 @@ int main(int argc, char* argv[]){
 
 		printf("Starting Server");
 		
-		Packet buf;
-		read(fd, &buf, sizeof(buf));
-		printf("\n%s", buf.data);
+		Packet* buf = (Packet*) malloc(sizeof(Packet));
+		read(fd, buf, sizeof(*buf));
+		printf("%i", buf->datalen);
+		read(fd, buf->data, buf->datalen);
+		printf("\n%s", ((struct BROD*)buf->data)->fileReq);
 
 	}
 
