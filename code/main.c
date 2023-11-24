@@ -31,12 +31,17 @@ int main(int argc, char* argv[]){
 
 		assert(listen(test2->Socket, 10)==0);
 		int fd = accept(test2->Socket, test2->ServerOpts.sockaddr, &test2->ServerOpts.socklen);
+		struct in_addr addr;
 
 		printf("Starting Server");
 		
 		Packet* buf = (Packet*) malloc(sizeof(Packet));
 		read(fd, buf, sizeof(*buf));
-		printf("%i", buf->datalen);
+		printf("\nProtocol: %s", buf->Proto);
+		printf("\nDatalen: %i", buf->datalen);
+		printf("\nMode: %x", *buf->Mode);
+		addr.s_addr = buf->IP;
+		printf("\nDst IP: %s", inet_ntoa(addr));
 		read(fd, buf->data, buf->datalen);
 		printf("\n%s", ((struct BROD*)buf->data)->fileReq);
 

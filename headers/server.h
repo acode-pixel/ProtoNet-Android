@@ -15,15 +15,15 @@ typedef struct serverOpts {
 } serverOpts;
 
 typedef struct Server {
-	int Socket;
-	int nConn;
-	uint32_t IP;
-	uint32_t destIP;
-	size_t size;
-	char serverName[12];
-	serverOpts ServerOpts;
-	Client client;
-	char dir[];
+	int Socket;		/* Socket */
+	int nConn;		/* number of clients connected */
+	uint32_t IP;		/* host IP */
+	uint32_t destIP;	/* Destination IP */
+	size_t size;		/* Server struct Size */
+	char serverName[12];	/* Server Name */
+	serverOpts ServerOpts;	/* Server Options */
+	Client client;		/* for client-server hybrid */
+	char dir[];		/* Server Dir */
 } Server;
 
 Server* Init(char* inter, char* ip, char* serverName, char Dir[]);

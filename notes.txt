@@ -34,7 +34,22 @@ packet Format:
 			8 : hops between client and server
 			9 - 1024 : File client requested 
 
+Socket Modes:
+	BROD - Socket is used for BROD packets
+	TRAC - Socket is used for TRAC packets
+	DATA - Socket is used for DATA packets
+	NONE - Socket is not used at all
+
 args:
 ./a.out client [inter] [name|none] [ip] [file request]
 ./a.out serv [inter] [ip to connect to|none] [serv name] [dir] 
+
+challenges:
+	creating socket manager
+
+Server runtime loop:
+	add any new sockets to a socket list
+	check the socket list if a socket has data to be read (using epoll)
+	use Socket manager to manage socket operations for each socket (if any)
+	print Sockets fds and their modes that are connected to the host
 

@@ -37,6 +37,6 @@ typedef struct SocketOpt {
 
 int setSockOpts(int sock, SocketOpt* so, char opts[]);
 uint32_t getInterIP(int fd,char inter[]);
-int sendPck(int fd, uint32_t IP, char* Mode, void* data);
+int sendPck(int fd, uint32_t IP, int Mode, void* data);
 
 #endif
