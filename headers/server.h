@@ -1,12 +1,16 @@
 #ifndef SERVER_H
 #define SERVER_H
 #define S_PORT 5657
+#define MAX_CLIENTS 10
+#define MAX_EVENTS 10
 
 #include "core.h"
 #include "client.h"
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <net/if.h>
+#include <sys/event.h>
+#include <sys/time.h>
 
 typedef struct serverOpts {
 	SocketOpt socketOpt;
@@ -14,19 +18,30 @@ typedef struct serverOpts {
 	socklen_t socklen;
 } serverOpts;
 
+typedef struct clientList {
+	Client clients[MAX_CLIENTS];
+} clientList;
+
 typedef struct Server {
 	int Socket;		/* Socket */
-	int nConn;		/* number of clients connected */
+	int kqueueInstance;
+	int lkqueueInstance;
+	int nConn;
 	uint32_t IP;		/* host IP */
 	uint32_t destIP;	/* Destination IP */
 	size_t size;		/* Server struct Size */
-	char serverName[12];	/* Server Name */
+	char serverName[12];	/* Server Name */ 
 	serverOpts ServerOpts;	/* Server Options */
+	struct kevent Events[MAX_CLIENTS];
 	Client client;		/* for client-server hybrid */
-	char dir[];		/* Server Dir */
+	clientList Clientlist;
+	char dir[];	/* Server Dir */
 } Server;
 
 Server* Init(char* inter, char* ip, char* serverName, char Dir[]);
+int addClient(int fd, Server* serv);
+int checkSockets(Server* serv);
+int ServerListen(Server* serv);
 
 
 #endif

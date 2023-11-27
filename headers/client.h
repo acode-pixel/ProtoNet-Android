@@ -5,8 +5,9 @@
 #define C_PORT 5657
 
 typedef struct Client {
-	int Socket;
 	char name[12];
+	int Socket;
+	int socketMode;
 } Client;
 
 Client* Cl_Init(char* inter, char name[]);
