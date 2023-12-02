@@ -49,12 +49,13 @@ Server* Init(char* inter, char* ip, char* serverName, char Dir[]){
 		serv->destIP = inet_addr(ip);
 	}
 
-	serv->kqueueInstance = kqueue();
-	serv->lkqueueInstance = kqueue();
+	serv->epollInstance = epoll_create(1);
+	serv->lepollInstance = epoll_create(MAX_CLIENTS);
 
-	struct kevent ev;
-	EV_SET(&ev, serv->Socket, EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, "LISTEN");
-	kevent(serv->lkqueueInstance, &ev, 1, NULL, 0, NULL);
+	struct epoll_event ev;
+	ev.events = EPOLLIN;
+	*ev.data.ptr = "LISTEN";
+	epoll_ctl(serv->lepollInstance, EPOLL_CTL_ADD, serv->Socket, &ev);
 	return serv;
 }
 
@@ -73,7 +74,7 @@ int delClient(int fd, Server* serv){
 }
 
 int addClient(int fd, Server* serv){
-	struct kevent ev;
+	struct epoll_event ev;
 
 	if (serv->nConn >= MAX_CLIENTS){
 		close(fd);
@@ -90,8 +91,9 @@ int addClient(int fd, Server* serv){
 		else if (serv->Clientlist.clients[i].Socket == 0){
 			serv->Clientlist.clients[i].Socket = fd;
 			serv->nConn += 1;
-			EV_SET(&ev, fd, EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, NULL);
-			kevent(serv->kqueueInstance, &ev, 1, NULL, 0, NULL);
+			ev.events = EPOLLIN | EPOLLOUT;
+			ev.data.fd = fd;
+			epoll_ctl(serv->epollInstance, EPOLL_ADD, fd, &ev);
 			printf("\nAdded %i to kqueue", fd);
 			return 0;
 		}
@@ -101,22 +103,19 @@ int addClient(int fd, Server* serv){
 }
 
 int checkSockets(Server* serv){
-	struct timespec ts;
-	ts.tv_sec = 1;
-       	ts.tv_nsec = 5000000;
-	int nevents = kevent(serv->kqueueInstance, NULL, 0, serv->Events, 10, &ts);
+	int nevents = epoll_wait(serv->epollInstance, serv->Events, MAX_CLIENTS, 1500);
 	printf("\n%i", nevents);
 	if (nevents == 0){
 		return 0;
 	}
-
+	// Should redesign loop if MAX_CLIENTS is larger
 	for (int i = 0; i < MAX_EVENTS; i++){
 
-		if (serv->Events[i].filter == EVFILT_READ && serv->Events[i].flags != EV_EOF){
-			printf("\n%s", serv->Events[i].udata);
-			printf("\nreading fd: %lu", serv->Events[i].ident);
+		if (serv->Events[i].events == EPOLLIN){
+			printf("\n%s", serv->Events[i].data.ptr);
+			printf("\nreading fd: %lu", serv->Events[i].data.fd);
 			Packet* buf = (Packet*) malloc(sizeof(Packet));
-			if (recv(serv->Events[i].ident, buf, sizeof(*buf), 0) == -1){
+			if (recv(serv->Events[i].data.fd, buf, sizeof(*buf), 0) == -1){
 				perror("read Failed:");
 				return errno;
 			}
@@ -128,11 +127,11 @@ int checkSockets(Server* serv){
 			printf("\nMode: %x", *buf->Mode);
 			addr.s_addr = buf->IP;
 			printf("\nDst IP: %s", inet_ntoa(addr));
-			read(serv->Events[i].ident, buf->data, buf->datalen);
+			read(serv->Events[i].data.fd, buf->data, buf->datalen);
 			printf("\n%s", ((struct BROD*)buf->data)->fileReq);
 
-			delClient(serv->Events[i].ident, serv);
-			close(serv->Events[i].ident);
+			delClient(serv->Events[i].data.fd, serv);
+			close(serv->Events[i].data.fd);
 
 		
 		}
@@ -143,15 +142,12 @@ int checkSockets(Server* serv){
 
 
 int ServerListen(Server* serv){
-	struct kevent ev;
-	struct timespec ts;
-	ts.tv_sec = 1;
-       	ts.tv_nsec = 0;
+	struct epoll_event ev;
 
-	int nSockets = kevent(serv->lkqueueInstance, NULL, 0, &ev, 1, &ts);
+	int nSockets = epoll_wait(serv->lepollInstance, &ev, 1, 1500);
 	printf("\nListening Events: %i", nSockets);
 
-	if (ev.filter == EVFILT_READ && ev.ident == serv->Socket){
+	if (ev.data.event == EPOLLIN){
 		int fd = accept(ev.ident, serv->ServerOpts.sockaddr, &serv->ServerOpts.socklen);	
 		return fd;
 	}

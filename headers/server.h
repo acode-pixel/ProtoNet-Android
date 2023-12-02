@@ -9,7 +9,7 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <net/if.h>
-#include <sys/event.h>
+#include <sys/epoll.h>
 #include <sys/time.h>
 
 typedef struct serverOpts {
@@ -24,15 +24,15 @@ typedef struct clientList {
 
 typedef struct Server {
 	int Socket;		/* Socket */
-	int kqueueInstance;
-	int lkqueueInstance;
+	int epollInstance;
+	int lepollInstance;
 	int nConn;
 	uint32_t IP;		/* host IP */
 	uint32_t destIP;	/* Destination IP */
 	size_t size;		/* Server struct Size */
 	char serverName[12];	/* Server Name */ 
 	serverOpts ServerOpts;	/* Server Options */
-	struct kevent Events[MAX_CLIENTS];
+	struct epoll_event Events[MAX_CLIENTS];
 	Client client;		/* for client-server hybrid */
 	clientList Clientlist;
 	char dir[];	/* Server Dir */
