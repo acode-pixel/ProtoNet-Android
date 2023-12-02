@@ -111,7 +111,7 @@ int checkSockets(Server* serv){
 	for (int i = 0; i < MAX_EVENTS; i++){
 
 		if (serv->Events[i].events == EPOLLIN){
-			printf("\n%s", (char*)serv->Events[i].data.ptr);
+			//printf("\n%s", (char*)serv->Events[i].data.ptr);
 			printf("\nreading fd: %d", serv->Events[i].data.fd);
 			Packet* buf = (Packet*) malloc(sizeof(Packet));
 			if (recv(serv->Events[i].data.fd, buf, sizeof(*buf), 0) == -1){
