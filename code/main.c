@@ -37,7 +37,7 @@ int main(int argc, char* argv[]){
 			printf("\nfd: %i", fd);
 			printf("\nnConn: %i", test2->nConn);
 			if (fd > 0){
-				addClient(fd, test2);
+				//addClient(fd, test2);
 			}
 			//checkSockets(test2);
 
