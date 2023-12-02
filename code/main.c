@@ -34,6 +34,7 @@ int main(int argc, char* argv[]){
 
 		while (true){
 			//int fd = ServerListen(test2);
+			int fd = 0;
 			printf("\nfd: %i", fd);
 			printf("\nnConn: %i", test2->nConn);
 			if (fd > 0){
