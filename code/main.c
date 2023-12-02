@@ -39,7 +39,7 @@ int main(int argc, char* argv[]){
 			if (fd > 0){
 				addClient(fd, test2);
 			}
-			checkSockets(test2);
+			//checkSockets(test2);
 
 			/*printf("\n%i", test2->Socket);
 			printf("\n%i", fd);
