@@ -54,7 +54,7 @@ Server* Init(char* inter, char* ip, char* serverName, char Dir[]){
 
 	struct epoll_event ev;
 	ev.events = EPOLLIN;
-	*ev.data.ptr = "LISTEN";
+	*((char*)ev.data.ptr) = "LISTEN";
 	epoll_ctl(serv->lepollInstance, EPOLL_CTL_ADD, serv->Socket, &ev);
 	return serv;
 }
@@ -93,7 +93,7 @@ int addClient(int fd, Server* serv){
 			serv->nConn += 1;
 			ev.events = EPOLLIN | EPOLLOUT;
 			ev.data.fd = fd;
-			epoll_ctl(serv->epollInstance, EPOLL_ADD, fd, &ev);
+			epoll_ctl(serv->epollInstance, EPOLL_CTL_ADD, fd, &ev);
 			printf("\nAdded %i to kqueue", fd);
 			return 0;
 		}
@@ -147,8 +147,8 @@ int ServerListen(Server* serv){
 	int nSockets = epoll_wait(serv->lepollInstance, &ev, 1, 1500);
 	printf("\nListening Events: %i", nSockets);
 
-	if (ev.data.event == EPOLLIN){
-		int fd = accept(ev.ident, serv->ServerOpts.sockaddr, &serv->ServerOpts.socklen);	
+	if (ev.event == EPOLLIN){
+		int fd = accept(serv->Socket, serv->ServerOpts.sockaddr, &serv->ServerOpts.socklen);	
 		return fd;
 	}
 	return 0;
