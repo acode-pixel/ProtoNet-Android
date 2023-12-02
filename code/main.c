@@ -33,7 +33,7 @@ int main(int argc, char* argv[]){
 		assert(listen(test2->Socket, 10)==0);
 
 		while (true){
-			int fd = ServerListen(test2);
+			//int fd = ServerListen(test2);
 			printf("\nfd: %i", fd);
 			printf("\nnConn: %i", test2->nConn);
 			if (fd > 0){
