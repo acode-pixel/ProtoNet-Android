@@ -33,14 +33,13 @@ int main(int argc, char* argv[]){
 		assert(listen(test2->Socket, 10)==0);
 
 		while (true){
-			//int fd = ServerListen(test2);
-			int fd = 0;
+			int fd = ServerListen(test2);
 			printf("\nfd: %i", fd);
 			printf("\nnConn: %i", test2->nConn);
 			if (fd > 0){
-				//addClient(fd, test2);
+				addClient(fd, test2);
 			}
-			//checkSockets(test2);
+			checkSockets(test2);
 
 			/*printf("\n%i", test2->Socket);
 			printf("\n%i", fd);
