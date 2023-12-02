@@ -4,8 +4,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/event.h>
-#include <sys/time.h>
 #include "client.h"
 #include "server.h"
 #include "core.h"
