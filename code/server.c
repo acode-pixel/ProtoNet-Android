@@ -54,7 +54,6 @@ Server* Init(char* inter, char* ip, char* serverName, char Dir[]){
 
 	struct epoll_event ev;
 	ev.events = EPOLLIN;
-	(char*)ev.data.ptr = "LISTEN";
 	epoll_ctl(serv->lepollInstance, EPOLL_CTL_ADD, serv->Socket, &ev);
 	return serv;
 }
