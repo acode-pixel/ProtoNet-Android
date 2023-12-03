@@ -49,12 +49,12 @@ Server* Init(char* inter, char* ip, char* serverName, char Dir[]){
 		serv->destIP = inet_addr(ip);
 	}
 
-	serv->epollInstance = epoll_create(1);
-	serv->lepollInstance = epoll_create(MAX_CLIENTS);
+	serv->epoll = epoll_create(MAX_CLIENTS);
+	serv->lepoll = epoll_create(1);
 
 	struct epoll_event ev;
 	ev.events = EPOLLIN;
-	epoll_ctl(serv->lepollInstance, EPOLL_CTL_ADD, serv->Socket, &ev);
+	epoll_ctl(serv->lepoll, EPOLL_CTL_ADD, serv->Socket, &ev);
 	return serv;
 }
 
@@ -90,9 +90,9 @@ int addClient(int fd, Server* serv){
 		else if (serv->Clientlist.clients[i].Socket == 0){
 			serv->Clientlist.clients[i].Socket = fd;
 			serv->nConn += 1;
-			ev.events = EPOLLIN | EPOLLOUT;
+			ev.events = EPOLLIN;
 			ev.data.fd = fd;
-			epoll_ctl(serv->epollInstance, EPOLL_CTL_ADD, fd, &ev);
+			epoll_ctl(serv->epoll, EPOLL_CTL_ADD, fd, &ev);
 			printf("\nAdded %i to kqueue", fd);
 			return 0;
 		}
@@ -102,13 +102,13 @@ int addClient(int fd, Server* serv){
 }
 
 int checkSockets(Server* serv){
-	int nevents = epoll_wait(serv->epollInstance, serv->Events, MAX_CLIENTS, 1500);
+	int nevents = epoll_wait(serv->epoll, serv->Events, MAX_CLIENTS, 1500);
 	printf("\n%i", nevents);
 	if (nevents == 0){
 		return 0;
 	}
 	// Should redesign loop if MAX_CLIENTS is larger
-	for (int i = 0; i < MAX_EVENTS; i++){
+	for (int i = 0; i < MAX_CLIENTS; i++){
 
 		if (serv->Events[i].events == EPOLLIN){
 			//printf("\n%s", (char*)serv->Events[i].data.ptr);
@@ -143,11 +143,11 @@ int checkSockets(Server* serv){
 int ServerListen(Server* serv){
 	struct epoll_event ev;
 
-	int nSockets = epoll_wait(serv->lepollInstance, &ev, 1, 1500);
+	int nSockets = epoll_wait(serv->lepoll, &ev, 1, 1500);
 	printf("\nListening Events: %i", nSockets);
 
 	if (ev.events == EPOLLIN){
-		int fd = accept(serv->Socket, serv->ServerOpts.sockaddr, &serv->ServerOpts.socklen);	
+		int fd = accept(serv->Socket, NULL, NULL);	
 		return fd;
 	}
 	return 0;

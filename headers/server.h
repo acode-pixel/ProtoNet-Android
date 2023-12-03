@@ -24,8 +24,8 @@ typedef struct clientList {
 
 typedef struct Server {
 	int Socket;		/* Socket */
-	int epollInstance;
-	int lepollInstance;
+	int epoll;
+	int lepoll;
 	int nConn;
 	uint32_t IP;		/* host IP */
 	uint32_t destIP;	/* Destination IP */
